@@ -3,9 +3,6 @@
 .env.*
 !.env.example
 
-# Use npm + package-lock.json for CI/Netlify; ignore Bun lock if generated locally
-bun.lock
-
 # Supabase CLI local cache
 supabase/.temp/
 
