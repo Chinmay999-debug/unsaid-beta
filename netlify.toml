@@ -1,0 +1,12 @@
+# Netlify: npm + package-lock.json (do not commit bun.lock — multiple lockfiles confuse CI).
+# TanStack Start + @cloudflare/vite-plugin emit `dist/client` (assets) and `dist/server` (Worker).
+# Primary production target for this app is Cloudflare Workers; this build validates install + bundle.
+
+[build]
+  command = "npm run build"
+  # Browser bundle + hashed assets (no root index.html — Worker serves HTML at the edge).
+  publish = "dist/client"
+
+[build.environment]
+  NODE_VERSION = "22.12.0"
+  # Netlify runs `npm install` before `command` when package-lock.json is present.
