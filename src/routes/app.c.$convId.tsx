@@ -125,44 +125,46 @@ function ChatPage() {
   const online = other && Date.now() - new Date(other.last_active).getTime() < 2 * 60_000;
 
   return (
-    <div
-      className="max-w-3xl mx-auto px-6 py-6 flex flex-col"
-      style={{ minHeight: "calc(100vh - 64px)" }}
-    >
-      <div className="flex items-center gap-3 pb-5 border-b border-border/40">
-        <Link to="/app" className="p-2 -ml-2 rounded-full hover:bg-white/5 transition-colors">
-          <ArrowLeft className="w-4 h-4 text-muted-foreground" />
+    <div className="mx-auto flex h-full min-h-0 w-full max-w-3xl flex-1 flex-col px-4 py-4 sm:px-6 sm:py-6">
+      <div className="flex shrink-0 items-center gap-2 border-b border-border/40 pb-4 sm:gap-3 sm:pb-5">
+        <Link
+          to="/app"
+          className="flex shrink-0 items-center justify-center rounded-full p-2.5 transition-colors hover:bg-white/5 min-h-[44px] min-w-[44px] sm:-ml-2"
+          aria-label="Back to inbox"
+        >
+          <ArrowLeft className="h-4 w-4 text-muted-foreground" />
         </Link>
         {other && (
           <>
-            <div className="relative">
+            <div className="relative shrink-0">
               <Orb seed={other.avatar_seed} size={40} />
               {online && (
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-ember ring-2 ring-background" />
+                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-ember ring-2 ring-background" />
               )}
             </div>
-            <div className="min-w-0">
-              <div className="font-display text-lg leading-tight">{other.username}</div>
-              <div className="text-[11px] text-muted-foreground">
-                {online ? "here, now" : "away"}
-              </div>
+            <div className="min-w-0 flex-1">
+              <div className="truncate font-display text-base leading-tight sm:text-lg">{other.username}</div>
+              <div className="text-[11px] text-muted-foreground">{online ? "here, now" : "away"}</div>
             </div>
           </>
         )}
       </div>
 
-      <div ref={scrollerRef} className="flex-1 overflow-y-auto py-6 space-y-3">
+      <div
+        ref={scrollerRef}
+        className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-y-contain py-4 sm:py-6 [-webkit-overflow-scrolling:touch]"
+      >
         {intro && messages.length === 0 && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-10"
+            className="px-1 py-6 text-center sm:py-10"
           >
-            <div className="text-xs tracking-[0.3em] text-muted-foreground mb-3">COMPANION</div>
-            <p className="font-display italic text-lg text-foreground/80 max-w-md mx-auto leading-snug">
+            <div className="mb-3 text-xs tracking-[0.3em] text-muted-foreground">COMPANION</div>
+            <p className="mx-auto max-w-md px-2 font-display text-base italic leading-snug text-foreground/80 sm:text-lg">
               &ldquo;{intro}&rdquo;
             </p>
-            <div className="text-xs text-muted-foreground/60 mt-4">say the first thing</div>
+            <div className="mt-4 text-xs text-muted-foreground/60">say the first thing</div>
           </motion.div>
         )}
         <AnimatePresence initial={false}>
@@ -174,13 +176,13 @@ function ChatPage() {
                 initial={{ opacity: 0, y: 6, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.25 }}
-                className={`flex ${mine ? "justify-end" : "justify-start"}`}
+                className={`flex ${mine ? "justify-end" : "justify-start"} px-0.5`}
               >
                 <div
-                  className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-[15px] leading-relaxed ${
+                  className={`max-w-[min(92vw,28rem)] px-3.5 py-2.5 text-[15px] leading-relaxed sm:max-w-[78%] sm:px-4 sm:py-2.5 ${
                     mine
-                      ? "bg-ember text-primary-foreground rounded-br-md"
-                      : "glass text-foreground rounded-bl-md"
+                      ? "rounded-2xl rounded-br-md bg-ember text-primary-foreground"
+                      : "glass rounded-2xl rounded-bl-md text-foreground"
                   }`}
                 >
                   {m.content}
@@ -191,20 +193,23 @@ function ChatPage() {
         </AnimatePresence>
       </div>
 
-      <form onSubmit={send} className="relative pb-2">
+      <form
+        onSubmit={send}
+        className="relative shrink-0 border-t border-transparent pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+      >
         <input
           autoFocus
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="write something honest…"
-          className="w-full px-5 py-4 pr-14 rounded-2xl glass text-[15px] placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring"
+          className="min-h-[48px] w-full rounded-2xl glass py-3.5 pl-4 pr-14 text-[15px] placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring sm:px-5 sm:py-4"
         />
         <button
           type="submit"
           disabled={!input.trim() || sending}
-          className="absolute right-2 top-1/2 -translate-y-1/2 -mt-1 w-10 h-10 rounded-full bg-ember text-primary-foreground flex items-center justify-center disabled:opacity-30 hover:scale-105 transition-transform"
+          className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ember text-primary-foreground transition-transform hover:scale-105 disabled:opacity-30 sm:right-2 sm:h-10 sm:w-10"
         >
-          <Send className="w-4 h-4" />
+          <Send className="h-4 w-4" />
         </button>
       </form>
     </div>

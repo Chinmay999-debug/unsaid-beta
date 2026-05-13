@@ -82,10 +82,10 @@ function InboxPage() {
   }, [user]);
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12">
+    <div className="mx-auto flex w-full min-h-0 max-w-3xl flex-1 flex-col px-4 py-6 sm:px-6 sm:py-12">
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display text-4xl md:text-5xl mb-2">Inbox</h1>
-        <p className="text-muted-foreground text-sm mb-10">
+        <h1 className="font-display text-3xl sm:text-4xl md:text-5xl mb-2">Inbox</h1>
+        <p className="text-muted-foreground text-sm mb-6 sm:mb-10">
           Conversations stay here, quietly waiting.
         </p>
       </motion.div>
@@ -95,7 +95,7 @@ function InboxPage() {
       ) : convs.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="space-y-2">
+        <div className="flex min-h-0 flex-1 flex-col space-y-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           {convs.map((c, i) => {
             const online =
               c.other && Date.now() - new Date(c.other.last_active).getTime() < 2 * 60_000;
@@ -109,24 +109,26 @@ function InboxPage() {
                 <Link
                   to="/app/c/$convId"
                   params={{ convId: c.id }}
-                  className="group flex items-center gap-4 p-4 rounded-2xl glass hover:bg-white/5 transition-colors"
+                  className="group flex min-w-0 items-start gap-3 rounded-2xl p-3.5 glass transition-colors hover:bg-white/5 sm:items-center sm:gap-4 sm:p-4 active:bg-white/[0.07]"
                 >
-                  <div className="relative">
+                  <div className="relative shrink-0 pt-0.5 sm:pt-0">
                     <Orb seed={c.other?.avatar_seed ?? c.id} size={48} />
                     {online && (
-                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-ember ring-2 ring-background" />
+                      <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-ember ring-2 ring-background" />
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline justify-between gap-3">
-                      <span className="font-display text-lg truncate">
+                  <div className="min-w-0 flex-1 overflow-hidden">
+                    <div className="flex min-w-0 flex-col gap-0.5 min-[380px]:flex-row min-[380px]:items-baseline min-[380px]:justify-between min-[380px]:gap-3">
+                      <span className="min-w-0 truncate font-display text-base sm:text-lg">
                         {c.other?.username ?? "Someone"}
                       </span>
-                      <span className="text-[11px] text-muted-foreground/60 shrink-0">
+                      <span className="shrink-0 text-[11px] text-muted-foreground/60 tabular-nums min-[380px]:text-right">
                         {formatDistanceToNow(new Date(c.last_message_at), { addSuffix: false })}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground truncate mt-0.5">{c.preview}</p>
+                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground sm:truncate sm:mt-0.5">
+                      {c.preview}
+                    </p>
                   </div>
                 </Link>
               </motion.div>
@@ -144,7 +146,7 @@ function EmptyState() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
-      className="relative text-center py-24 rounded-3xl glass overflow-hidden"
+      className="relative overflow-hidden rounded-3xl px-4 py-16 text-center glass sm:py-24"
     >
       <div className="absolute inset-0 -z-10 flex items-center justify-center">
         <div className="w-72 h-72 rounded-full bg-[var(--gradient-ember)] blur-3xl animate-breathe opacity-50" />

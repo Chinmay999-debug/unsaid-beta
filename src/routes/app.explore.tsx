@@ -185,11 +185,8 @@ function ExplorePage() {
   const userMessageCount = messages.filter((m) => m.role === "user").length;
 
   return (
-    <div
-      className="max-w-3xl mx-auto px-6 py-10 flex flex-col"
-      style={{ minHeight: "calc(100vh - 64px)" }}
-    >
-      <div className="flex items-center gap-3 mb-8">
+    <div className="mx-auto flex h-full min-h-0 w-full max-w-3xl flex-1 flex-col px-4 py-6 sm:px-6 sm:py-10">
+      <div className="mb-6 flex shrink-0 items-center gap-3 sm:mb-8">
         <div className="relative">
           <span className="block w-9 h-9 rounded-full bg-gradient-to-br from-ember to-accent shadow-[0_0_30px_var(--ember-deep)] animate-breathe" />
         </div>
@@ -201,7 +198,7 @@ function ExplorePage() {
         </div>
       </div>
 
-      <div ref={scrollerRef} className="flex-1 overflow-y-auto space-y-5 pr-1 pb-6">
+      <div ref={scrollerRef} className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-y-contain pr-0.5 pb-4 [-webkit-overflow-scrolling:touch] sm:pr-1 sm:pb-6">
         <AnimatePresence initial={false}>
           {messages.map((m) => (
             <motion.div
@@ -212,11 +209,11 @@ function ExplorePage() {
               className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
             >
               {m.role === "assistant" ? (
-                <p className="max-w-[85%] text-[17px] leading-relaxed text-foreground/90 font-display">
+                <p className="max-w-[min(92vw,28rem)] text-[16px] leading-relaxed text-foreground/90 sm:max-w-[85%] sm:text-[17px] font-display">
                   {m.content}
                 </p>
               ) : (
-                <div className="max-w-[80%] px-4 py-2.5 rounded-2xl bg-secondary/70 text-secondary-foreground text-[15px] leading-relaxed">
+                <div className="max-w-[min(92vw,28rem)] rounded-2xl bg-secondary/70 px-3.5 py-2.5 text-[15px] leading-relaxed text-secondary-foreground sm:max-w-[80%] sm:px-4 sm:py-2.5">
                   {m.content}
                 </div>
               )}
@@ -241,16 +238,16 @@ function ExplorePage() {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="self-center mb-4 w-full max-w-xl p-4 rounded-2xl glass"
+          className="mb-4 w-full max-w-xl self-center rounded-2xl p-4 glass sm:p-5"
         >
-          <p className="text-sm text-foreground/90 text-center mb-3">
+          <p className="mb-4 text-center text-sm text-foreground/90">
             Want to keep chatting with {COMPANION_NAME}, or connect with someone who feels resonant?
           </p>
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-center sm:gap-3">
             <button
               type="button"
               onClick={() => setConnectionPromptOpen(false)}
-              className="px-4 py-2 rounded-full glass text-sm hover:bg-white/5 transition-colors"
+              className="rounded-full px-4 py-3 text-sm glass transition-colors hover:bg-white/5 sm:py-2"
             >
               Keep chatting
             </button>
@@ -258,7 +255,7 @@ function ExplorePage() {
               type="button"
               onClick={findSomeone}
               disabled={searching}
-              className="px-4 py-2 rounded-full bg-ember text-primary-foreground text-sm hover:scale-[1.02] transition-transform disabled:opacity-60"
+              className="rounded-full bg-ember px-4 py-3 text-sm text-primary-foreground transition-transform hover:scale-[1.02] disabled:opacity-60 sm:py-2"
             >
               {searching ? "Looking quietly…" : "Connect me"}
             </button>
@@ -266,18 +263,18 @@ function ExplorePage() {
         </motion.div>
       )}
 
-      <form onSubmit={handleSend} className="relative">
+      <form onSubmit={handleSend} className="relative shrink-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <input
           autoFocus
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="say what's unsaid…"
-          className="w-full px-5 py-4 pr-14 rounded-2xl glass text-[15px] placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring"
+          className="min-h-[48px] w-full rounded-2xl glass py-3.5 pl-4 pr-14 text-[15px] placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring sm:px-5 sm:py-4"
         />
         <button
           type="submit"
           disabled={!input.trim() || thinking}
-          className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-ember text-primary-foreground flex items-center justify-center disabled:opacity-30 hover:scale-105 transition-transform"
+          className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ember text-primary-foreground transition-transform hover:scale-105 disabled:opacity-30 sm:right-2 sm:h-10 sm:w-10"
         >
           <Send className="w-4 h-4" />
         </button>
@@ -289,20 +286,22 @@ function ExplorePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center px-6 bg-background/80 backdrop-blur-xl"
+            className="fixed inset-0 z-50 flex items-end justify-center bg-background/80 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-10 backdrop-blur-xl sm:items-center sm:px-6 sm:pb-6 sm:pt-6"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="relative max-w-md w-full p-10 rounded-3xl glass text-center overflow-hidden"
+              className="relative max-h-[min(92dvh,640px)] w-full max-w-md overflow-y-auto overscroll-contain rounded-3xl p-6 text-center glass sm:max-h-[85dvh] sm:p-10"
             >
               <div className="absolute inset-0 -z-10 flex items-center justify-center">
                 <div className="w-96 h-96 rounded-full bg-[var(--gradient-ember)] blur-3xl animate-breathe opacity-60" />
               </div>
-              <div className="flex justify-center mb-6">
-                <Orb seed={match.avatar_seed} size={88} />
+              <div className="mb-5 flex justify-center sm:mb-6">
+                <div className="origin-center scale-[0.82] sm:scale-100">
+                  <Orb seed={match.avatar_seed} size={88} />
+                </div>
               </div>
               <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
                 {match.id === BOT_MATCH_ID ? "companion" : "someone"}

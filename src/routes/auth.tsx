@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -15,6 +16,9 @@ function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
@@ -24,8 +28,12 @@ function AuthPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setErr("");
+    if (mode === "signup" && password !== confirmPassword) {
+      setErr("Passwords do not match.");
+      return;
+    }
+    setLoading(true);
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
@@ -47,16 +55,16 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
+    <div className="relative flex min-h-[100dvh] w-full flex-col items-stretch justify-center overflow-hidden px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
       <div className="absolute inset-0 -z-10 flex items-center justify-center">
-        <div className="w-[80vmin] h-[80vmin] rounded-full bg-[var(--gradient-ember)] blur-3xl animate-breathe opacity-60" />
+        <div className="h-[80vmin] w-[80vmin] rounded-full bg-[var(--gradient-ember)] blur-3xl animate-breathe opacity-60" />
       </div>
 
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9 }}
-        className="w-full max-w-md"
+        className="mx-auto w-full max-w-md"
       >
         <Link
           to="/"
@@ -92,14 +100,46 @@ function AuthPage() {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-3.5 rounded-2xl glass text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-ring"
           />
-          <input
-            type="password"
-            required
-            placeholder="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3.5 rounded-2xl glass text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-ring"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              required
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+              placeholder="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-2xl glass py-3.5 pl-4 pr-12 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+          {mode === "signup" && (
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                required
+                autoComplete="new-password"
+                placeholder="confirm password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full rounded-2xl glass py-3.5 pl-4 pr-12 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-ring"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((v) => !v)}
+                className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
+                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          )}
           {err && <div className="text-xs text-destructive px-1">{err}</div>}
           <button
             type="submit"
@@ -111,7 +151,14 @@ function AuthPage() {
         </form>
 
         <button
-          onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
+          type="button"
+          onClick={() => {
+            setMode(mode === "signup" ? "signin" : "signup");
+            setErr("");
+            setConfirmPassword("");
+            setShowPassword(false);
+            setShowConfirmPassword(false);
+          }}
           className="block mx-auto mt-8 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           {mode === "signup" ? "Already here? Sign in" : "New here? Step in"}
