@@ -64,28 +64,16 @@ function ExplorePage() {
   }
 
   useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("ai_messages")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: true })
-      .then(({ data }) => {
-        const msgs = (data ?? []) as AiMsg[];
-        if (msgs.length === 0) {
-          // seed an opening line locally
-          setMessages([
-            {
-              id: "seed",
-              role: "assistant",
-              content: "Hey. No pressure to perform here. What's been sitting on your mind lately?",
-              created_at: new Date().toISOString(),
-            },
-          ]);
-        } else {
-          setMessages(msgs);
-        }
-      });
+    // Always start with a fresh chat experience, as requested.
+    // Old AI chats are not loaded to ensure a "start over" behavior.
+    setMessages([
+      {
+        id: "seed",
+        role: "assistant",
+        content: "Hey. No pressure to perform here. What's been sitting on your mind lately?",
+        created_at: new Date().toISOString(),
+      },
+    ]);
   }, [user]);
 
   useEffect(() => {

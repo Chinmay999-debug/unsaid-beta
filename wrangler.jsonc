@@ -1,5 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
+  // Secrets / vars set in the Cloudflare dashboard are passed as `env` to `src/server.ts`,
+  // which copies them onto `process.env` for server functions (e.g. ADMIN_EMAILS).
   "name": "tanstack-start-app",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],

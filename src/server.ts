@@ -71,17 +71,24 @@ async function ensureNodeWebSocketSupport() {
   }
 }
 
+function envValueIsUnset(v: string | undefined): boolean {
+  return v == null || v === "";
+}
+
 function hydrateProcessEnv(env: unknown) {
   if (!env || typeof env !== "object") return;
   const record = env as Record<string, unknown>;
   for (const [key, value] of Object.entries(record)) {
     if (typeof key !== "string") continue;
     if (value == null) continue;
-    // Only set if absent to avoid surprising overrides in dev
-    if (process.env[key] != null) continue;
+    // Prefer runtime Worker bindings over empty build-time placeholders (Vite/define
+    // often sets missing `process.env.*` to "").
     if (typeof value === "string") {
+      if (value === "") continue;
+      if (!envValueIsUnset(process.env[key])) continue;
       process.env[key] = value;
     } else if (typeof value === "number" || typeof value === "boolean") {
+      if (!envValueIsUnset(process.env[key])) continue;
       process.env[key] = String(value);
     }
   }

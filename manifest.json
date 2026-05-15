@@ -1,0 +1,24 @@
+{
+  "short_name": "Unsaid",
+  "name": "Unsaid - Mysterious Social App",
+  "id": "com.unsaid.app",
+  "icons": [
+    {
+      "src": "/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "orientation": "portrait",
+  "description": "Unsaid: A premium mobile-first social app experience.",
+}

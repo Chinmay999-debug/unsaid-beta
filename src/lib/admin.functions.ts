@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 function getAllowedAdminEmails(): Set<string> {
+  // Populated from Cloudflare `env` → `process.env` in `src/server.ts` (see hydrateProcessEnv).
   const raw = (process.env.ADMIN_EMAILS || "").trim();
   if (!raw) return new Set();
   return new Set(
@@ -19,10 +20,27 @@ function requireAdmin(claims: Record<string, unknown>) {
   if (!allowed.size) {
     throw new Error("Admin panel not configured. Set ADMIN_EMAILS in .env");
   }
-  const email = String(claims.email ?? "").toLowerCase();
+  const email = emailFromClaims(claims);
+  if (!email) {
+    throw new Error(
+      "Admin check: no email on this session. Use email/password sign-in, or add email to your account.",
+    );
+  }
   if (!allowed.has(email)) {
     throw new Error("Unauthorized admin access");
   }
+}
+
+/** Supabase JWT / getClaims() shape varies slightly; normalize to a single email string. */
+function emailFromClaims(claims: Record<string, unknown>): string {
+  const direct = claims.email;
+  if (typeof direct === "string" && direct.trim()) return direct.trim().toLowerCase();
+  const meta = claims.user_metadata;
+  if (meta && typeof meta === "object" && meta !== null && "email" in meta) {
+    const e = (meta as { email?: unknown }).email;
+    if (typeof e === "string" && e.trim()) return e.trim().toLowerCase();
+  }
+  return "";
 }
 
 type AdminRecentItem = {
@@ -30,6 +48,12 @@ type AdminRecentItem = {
   created_at: string;
   content: string;
 };
+
+function throwIfSupabaseError(scope: string, res: { error: { message: string } | null }) {
+  if (res.error) {
+    throw new Error(`${scope}: ${res.error.message}`);
+  }
+}
 
 export const getAdminSnapshot = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -59,6 +83,14 @@ export const getAdminSnapshot = createServerFn({ method: "GET" })
           .order("created_at", { ascending: false })
           .limit(12),
       ]);
+
+    throwIfSupabaseError("count profiles", profilesCount);
+    throwIfSupabaseError("count conversations", convCount);
+    throwIfSupabaseError("count messages", msgCount);
+    throwIfSupabaseError("count ai_messages", aiCount);
+    throwIfSupabaseError("count active profiles", activeNow);
+    throwIfSupabaseError("recent messages", recentMessages);
+    throwIfSupabaseError("recent ai_messages", recentAi);
 
     return {
       counts: {
